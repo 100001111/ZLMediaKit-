@@ -44,6 +44,7 @@ static TcpServer::Ptr rtcServer_tcp;
 
 #if defined(ENABLE_SRT)
 #include "../srt/SrtSession.hpp"
+#include "mk_util.h"
 static UdpServer::Ptr srtServer;
 #endif
 
@@ -213,6 +214,64 @@ API_EXPORT uint16_t API_CALL mk_rtsp_server_start(uint16_t port, int ssl) {
         WarnL << ex.what();
         return 0;
     }
+}
+
+API_EXPORT uint16_t API_CALL mk_tuned_rtsp_server_start(uint16_t port, char* server_id, int ssl) {
+    ssl = MAX(0, MIN(ssl,1));
+
+    // Create tuned configuration.
+    mk_ini ini = mk_ini_default();
+    mk_ini_set_option(ini, "api.apiDebug", "0"); // Disable http logs
+    mk_ini_set_option(ini, "api.secret", "035c73f7-bb6b-4889-a715-d9eb2d1925c1");
+
+    // [protocol]
+    mk_ini_set_option_int(ini, "protocol.modify_stamp", 0); // Use original timestamp
+    mk_ini_set_option_int(ini, "protocol.enable_audio", 0); // Disable audio
+    mk_ini_set_option_int(ini, "protocol.auto_close", 1); // Enable auto close when no consumer
+    mk_ini_set_option_int(ini, "protocol.enable_hls", 0); // Disable hls
+    mk_ini_set_option_int(ini, "protocol.enable_hls_fmp4", 0); // Disable hls fmp4
+    mk_ini_set_option_int(ini, "protocol.enable_mp4", 0); // Disable mp4 recording
+    mk_ini_set_option_int(ini, "protocol.enable_rtsp", 1); // Enable RTSP/webrtc
+    mk_ini_set_option_int(ini, "protocol.enable_rtmp", 0); // Disable RTMP/flv
+    mk_ini_set_option_int(ini, "protocol.enable_ts", 0); // Disable http-ts/ws-ts
+    mk_ini_set_option_int(ini, "protocol.enable_fmp4", 0); // Disable http-fmp4/ws-fmp4
+    mk_ini_set_option_int(ini, "protocol.enable_rtsp", 1); // Enable RTSP/webrtc
+
+    mk_ini_set_option_int(ini, "protocol.hls_demand", 1); // For performance, make hls on demand
+    mk_ini_set_option_int(ini, "protocol.rtmp_demand", 1); // For performance, make rtmp on demand
+    mk_ini_set_option_int(ini, "protocol.ts_demand", 1); // For performance, make ts on demand
+    mk_ini_set_option_int(ini, "protocol.fmp4_demand", 1); // For performance, make fmp4 on demand
+
+    mk_ini_set_option_int(ini, "general.maxStreamWaitMS", 2000); // If within 2 seconds no steam established, just return fail.
+    mk_ini_set_option_int(ini, "general.mergeWriteMS", 0); // Disable pack writing of socket.
+
+    mk_ini_set_option(ini, "general.mediaServerId", server_id);
+    mk_ini_set_option_int(ini, "general.wait_audio_track_data_ms", 200); // > 0.2 second if audio track not loaded, then ignore it.
+    mk_ini_set_option_int(ini, "general.unready_frame_cache", 50); // if track is yet ready, cache the frames, 50 is them maximum number, to avoid memory overflow.
+
+    mk_ini_set_option_int(ini, "rtp.audioMtuSize", 10);
+    mk_ini_set_option_int(ini, "rtp.videoMtuSize", 700);
+    mk_ini_set_option_int(ini, "rtp.lowLatency", 1);
+    mk_ini_set_option_int(ini, "rtp.gop_cache", 1);
+
+    mk_ini_set_option_int(ini, "rtsp.directProxy", 0); // Disable direct proxy.
+    mk_ini_set_option_int(ini, "rtsp.lowLatency", 1); // Enable low latency.
+
+    mk_config config = {
+        .thread_num = 4, // Use 4 threads
+        .log_level = 0, // 0 - 4
+        .log_mask = LOG_FILE, // Use file as log holders.
+        .log_file_path = "./logs",
+        .log_file_days = 30, // Max 30 days logs.
+        .ini_is_path = false,
+        .ini = mk_ini_dump_string(ini),
+        .ssl_is_path = false,
+        .ssl = nullptr,
+        .ssl_pwd = nullptr
+    };
+
+    mk_env_init(&config);
+    return mk_rtsp_server_start(port, ssl);
 }
 
 API_EXPORT uint16_t API_CALL mk_rtmp_server_start(uint16_t port, int ssl) {

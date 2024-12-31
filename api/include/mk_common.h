@@ -221,6 +221,22 @@ API_EXPORT uint16_t API_CALL mk_http_server_start(uint16_t port, int ssl);
  */
 API_EXPORT uint16_t API_CALL mk_rtsp_server_start(uint16_t port, int ssl);
 
+
+/**
+ * 创建调优过的rtsp[s]服务器
+ * @param port rtsp监听端口，推荐554，传入0则随机分配
+ * @param ssl 是否为ssl类型服务器
+ * @return 0:失败,非0:端口号
+ * Create rtsp[s] server
+ * @param port rtsp listening port, recommended 554, pass in 0 to randomly allocate
+ * @param ssl Whether it is an ssl type server
+ * @return 0: failure, non-0: port number
+
+ * [AUTO-TRANSLATED:3d984d90]
+ */
+API_EXPORT uint16_t API_CALL mk_tuned_rtsp_server_start(uint16_t port, char* server_id, int ssl)
+
+
 /**
  * 创建rtmp[s]服务器
  * @param port rtmp监听端口，推荐1935，传入0则随机分配

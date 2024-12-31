@@ -46,7 +46,6 @@ typedef struct mk_media_t *mk_media;
  */
 API_EXPORT mk_media API_CALL mk_media_create(const char *vhost, const char *app, const char *stream,
                                              float duration, int hls_enabled, int mp4_enabled);
-
 /**
  * 创建一个媒体源
  * @param vhost 虚拟主机名，一般为__defaultVhost__
@@ -494,6 +493,8 @@ API_EXPORT void API_CALL mk_media_stop_send_rtp(mk_media ctx, const char *ssrc);
  */
 API_EXPORT mk_thread API_CALL mk_media_get_owner_thread(mk_media ctx);
 
+
+API_EXPORT void API_CALL mk_
 
 #ifdef __cplusplus
 }
