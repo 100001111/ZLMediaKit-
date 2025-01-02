@@ -493,9 +493,6 @@ API_EXPORT void API_CALL mk_media_stop_send_rtp(mk_media ctx, const char *ssrc);
  */
 API_EXPORT mk_thread API_CALL mk_media_get_owner_thread(mk_media ctx);
 
-
-API_EXPORT void API_CALL mk_
-
 #ifdef __cplusplus
 }
 #endif

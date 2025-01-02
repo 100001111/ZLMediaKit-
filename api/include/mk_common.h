@@ -234,7 +234,7 @@ API_EXPORT uint16_t API_CALL mk_rtsp_server_start(uint16_t port, int ssl);
 
  * [AUTO-TRANSLATED:3d984d90]
  */
-API_EXPORT uint16_t API_CALL mk_tuned_rtsp_server_start(uint16_t port, char* server_id, int ssl)
+API_EXPORT uint16_t API_CALL mk_tuned_rtsp_server_start(uint16_t port, char* server_id, int ssl);
 
 
 /**
