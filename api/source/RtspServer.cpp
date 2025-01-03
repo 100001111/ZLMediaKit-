@@ -96,7 +96,7 @@ ProtocolOption defaultProtocol() {
     return option;
 }
 
-shared_ptr<PlayerProxy> setupNewProxy(const std::string& key, MediaTuple &mt) {
+shared_ptr<PlayerProxy> setup_new_proxy(const std::string& key, MediaTuple &mt) {
     auto proxy = proxy_container.make(key, mt, defaultProtocol(), MAX_RETRY);
     (*proxy)[Client::kRtpType] = 0; // rtsp pulling protocol, 0: tcp, 1: udp, 2: broadcast
     (*proxy)[Client::kTimeoutMS] = RETRY_WAITING; // within 10 seconds must establish connection to original stream.
@@ -109,13 +109,13 @@ shared_ptr<PlayerProxy> setupNewProxy(const std::string& key, MediaTuple &mt) {
 }
 
 void on_mk_media_no_reader(mk_media_source sender) {
-    cout << "I received close signal" << endl;
-
-    cout << mk_media_source_get_schema(sender) << endl;
-
+    // TODO: make media source cached able for fast establishing.
     auto src = (MediaSource *)sender;
-    auto key = src->getMediaTuple().shortUrl();
-    cout << "key: " << key << endl;
+    const std::string key = src->getMediaTuple().shortUrl();
+    log_printf(0, "I received no watching signal of %s, "
+                  "by current implementation there is no cache "
+                  "mechanism for fast establishing, I will force "
+                  "close the stream by now", &key);
 
     auto proxy = proxy_container.find(key);
 
@@ -132,7 +132,7 @@ void on_mk_media_no_reader(mk_media_source sender) {
     }
 }
 
-RtspServer::RtspServer(short portId, const string &serverId, bool autoClose) {
+void RtspServer::start(short portId, const string &serverId, bool autoClose, const std::vector<RtspProxy>& proxies) {
     // Create rtsp server
     mk_tuned_rtsp_server_start(portId, serverId.c_str(), false, autoClose);
     proxy_container.clear();
@@ -145,57 +145,53 @@ RtspServer::RtspServer(short portId, const string &serverId, bool autoClose) {
     }
 }
 
-void RtspServer::setupRtspServer(short portId, const std::string &serverId, const std::vector<RtspProxy>& proxies) {
-
-//    // Create stream server
-//    mk_tuned_rtsp_server_start(portId, serverId.c_str(), false);
-//
-//    // Process pre cached proxies.
-//    proxy_container.clear();
-//    for (const RtspProxy& proxy : proxies) {
-//        auto mediaTuple = MediaTuple { proxy.vHost, proxy.app, proxy.streamId };
-//        auto key = mediaTuple.shortUrl();
-//        setupNewProxy(key, mediaTuple);
-//    }
-}
-
-void RtspServer::runProxy(const RtspProxy &rtspProxy) {
+void RtspServer::startProxy(const RtspProxy &rtspProxy) {
     auto mediaTuple = MediaTuple { rtspProxy.vHost, rtspProxy.app, rtspProxy.streamId };
     auto key = mediaTuple.shortUrl();
     auto proxy = proxy_container.find(key);
-//    if (proxy && proxy->getStatus() == 1) {
-//        // The pulling proxy is already started.
-//        return;
-//    }
-    if (proxy == nullptr) {
-        // Create new proxy
-        proxy = setupNewProxy(key, mediaTuple);
+    if (proxy) {
+        // The pulling proxy is already started.
+        log_printf(0, "The proxy for %s is already running, so I skip here.", &key);
+        return;
     }
 
-    cout << "Before play:" << proxy->getUrl() << ";" << proxy->getStatus() << endl;
-
+    // Create new proxy
+    proxy = setup_new_proxy(key, mediaTuple);
     proxy->play(rtspProxy.pullingAddr);
-    cout << "After play:" << proxy->getUrl() << ";" << proxy->getStatus() << endl;
 }
 
 void RtspServer::stopProxy(const RtspProxy &rtspProxy) {
     auto mediaTuple = MediaTuple { rtspProxy.vHost, rtspProxy.app, rtspProxy.streamId };
     auto key = mediaTuple.shortUrl();
     auto proxy = proxy_container.find(key);
-    cout << "Before stop:" << proxy->getUrl() << ";" << proxy->getStatus() << endl;
+
     if (proxy) {
+        // Stop media source first
         shared_ptr<MediaSource> src = MediaSource::find("rtsp", mediaTuple.vhost, mediaTuple.app, mediaTuple.stream);
         proxy->getPoller()->async_first([src, proxy]() {
-            src->getMuxer().reset();
             src->close(true);
             proxy->setMediaSource(nullptr);
             proxy->teardown();
             proxy->clear();
-            cout << "After tear down:" << proxy->getUrl() << ";" << proxy->getStatus() << endl;
         });
 
-        WarnL << "close media: " << mediaTuple.shortUrl();
+        proxy_container.erase(key);
     }
+}
+std::vector<RtspProxy> RtspServer::getLiveProxies() {
 
-    cout << "After stop:" << proxy->getUrl() << ";" << proxy->getStatus() << endl;
+    std::vector<RtspProxy> proxies;
+    proxy_container.for_each([&proxies](const std::string& key, const PlayerProxy::Ptr& p) {
+        auto tuple = p->getMediaTuple();
+        proxies.push_back({ tuple.vhost, tuple.app, tuple.stream, p->getUrl() });
+    });
+
+    return proxies;
+}
+
+void RtspServer::stop() {
+    cout << "Now I am stopping the rtsp server" << endl;
+    log_printf(0, "Now I am stopping the rtsp server");
+    mk_stop_all_server();
+    log_printf(0, "I have stopped the rtsp server");
 }

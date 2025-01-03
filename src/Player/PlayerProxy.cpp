@@ -218,6 +218,10 @@ void PlayerProxy::setDirectProxy() {
 }
 
 PlayerProxy::~PlayerProxy() {
+    cout << "I get killed" << endl;
+    cout << "I get killed" << endl;
+    cout << "I get killed" << endl;
+    cout << "I get killed" << endl;
     _timer.reset();
     // 避免析构时, 忘记回调api请求  [AUTO-TRANSLATED:1ad9ad52]
     // Avoid forgetting to callback api request when destructing

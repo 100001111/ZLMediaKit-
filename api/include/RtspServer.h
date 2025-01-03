@@ -19,10 +19,11 @@ struct RtspProxy {
 
 class RtspServer {
 public:
-    RtspServer(short portId, const std::string &serverId, bool autoClose);
-    void setupRtspServer(short portId, const std::string &serverId, const std::vector<RtspProxy>& proxies);
-    void runProxy(const RtspProxy &rtspProxy);
-    void stopProxy(const RtspProxy &rtspProxy);
+    static void start(short portId, const std::string &serverId, bool autoClose, const std::vector<RtspProxy>& proxies);
+    static void stop();
+    static void startProxy(const RtspProxy &rtspProxy);
+    static void stopProxy(const RtspProxy &rtspProxy);
+    static std::vector<RtspProxy> getLiveProxies();
 };
 
 #endif // ZLMEDIAKIT_RTSPSERVER_H
