@@ -216,7 +216,7 @@ API_EXPORT uint16_t API_CALL mk_rtsp_server_start(uint16_t port, int ssl) {
     }
 }
 
-API_EXPORT uint16_t API_CALL mk_tuned_rtsp_server_start(uint16_t port, char* server_id, int ssl) {
+API_EXPORT uint16_t API_CALL mk_tuned_rtsp_server_start(uint16_t port, const char* server_id, int ssl, int auto_close) {
     ssl = MAX(0, MIN(ssl,1));
 
     // Create tuned configuration.
@@ -227,7 +227,7 @@ API_EXPORT uint16_t API_CALL mk_tuned_rtsp_server_start(uint16_t port, char* ser
     // [protocol]
     mk_ini_set_option_int(ini, "protocol.modify_stamp", 0); // Use original timestamp
     mk_ini_set_option_int(ini, "protocol.enable_audio", 0); // Disable audio
-    mk_ini_set_option_int(ini, "protocol.auto_close", 0); // Enable auto close when no consumer
+    mk_ini_set_option_int(ini, "protocol.auto_close", auto_close); // Enable auto close when no consumer
     mk_ini_set_option_int(ini, "protocol.enable_hls", 0); // Disable hls
     mk_ini_set_option_int(ini, "protocol.enable_hls_fmp4", 0); // Disable hls fmp4
     mk_ini_set_option_int(ini, "protocol.enable_mp4", 0); // Disable mp4 recording

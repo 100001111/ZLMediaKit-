@@ -97,7 +97,7 @@ API_EXPORT void API_CALL mk_setup_tuned_rtsp_server_n_proxies() {
 
     // Create stream server
     char server_id[] = "123";
-    mk_tuned_rtsp_server_start(8899, server_id, false);
+    mk_tuned_rtsp_server_start(8899, server_id, false, false);
 
     // Process proxies
     proxy_container.clear();
