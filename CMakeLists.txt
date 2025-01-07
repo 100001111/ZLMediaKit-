@@ -38,7 +38,7 @@ option(ENABLE_API_STATIC_LIB "Enable mk_api static lib" OFF)
 option(ENABLE_ASAN "Enable Address Sanitize" OFF)
 option(ENABLE_CXX_API "Enable C++ API SDK" OFF)
 option(ENABLE_FAAC "Enable FAAC" OFF)
-option(ENABLE_FFMPEG "Enable FFmpeg" OFF)
+option(ENABLE_FFMPEG "Enable FFmpeg" ON)
 option(ENABLE_HLS "Enable HLS" ON)
 option(ENABLE_JEMALLOC_STATIC "Enable static linking to the jemalloc library" OFF)
 option(ENABLE_JEMALLOC_DUMP "Enable jemalloc to dump malloc statistics" OFF)
@@ -58,8 +58,10 @@ option(ENABLE_WEBRTC "Enable WebRTC" ON)
 option(ENABLE_X264 "Enable x264" ON)
 option(ENABLE_WEPOLL "Enable wepoll" ON)
 option(ENABLE_VIDEOSTACK "Enable video stack" OFF)
+option(ENABLE_ZY_PLAYER "Enable zy player" ON)
 option(DISABLE_REPORT "Disable report to report.zlmediakit.com" OFF)
 option(USE_SOLUTION_FOLDERS "Enable solution dir supported" ON)
+
 ##############################################################################
 # 设置socket默认缓冲区大小为256k.如果设置为0则不设置socket的默认缓冲区大小,使用系统内核默认值(设置为0仅对linux有效)
 # Set the default buffer size of the socket to 256k. If set to 0, the default buffer size of the socket will not be set,
@@ -543,6 +545,10 @@ endif()
 #cpp test demo program
 if (ENABLE_TESTS)
   add_subdirectory(tests)
+endif ()
+
+if (ENABLE_ZY_PLAYER)
+  add_subdirectory(player_zy)
 endif ()
 
 # 拷贝www文件夹、配置文件、默认证书

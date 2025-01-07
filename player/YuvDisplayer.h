@@ -25,7 +25,7 @@ extern "C" {
 #pragma comment(lib,"SDL2.lib")
 #endif //defined(_WIN32)
 
-#define REFRESH_EVENT   (SDL_USEREVENT + 1)
+#define REFRESH_EVENT (SDL_USEREVENT + 1)
 
 class SDLDisplayerHelper
 {
