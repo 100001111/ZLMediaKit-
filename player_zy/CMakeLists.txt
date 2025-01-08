@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1.1)
 
 project(zy_player_lib VERSION 1.0.0 DESCRIPTION "ZY Player Library")
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(LINK_LIBRARIES ${MK_LINK_LIBRARIES})
 

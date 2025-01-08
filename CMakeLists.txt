@@ -69,7 +69,7 @@ option(USE_SOLUTION_FOLDERS "Enable solution dir supported" ON)
 set(SOCKET_DEFAULT_BUF_SIZE 262144 CACHE STRING "Default buffer size for socket" FORCE)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  set(CMAKE_BUILD_TYPE "Release")
+  set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 message(STATUS "编译类型: ${CMAKE_BUILD_TYPE}")

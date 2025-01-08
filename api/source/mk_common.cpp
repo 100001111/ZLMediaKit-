@@ -257,18 +257,16 @@ API_EXPORT uint16_t API_CALL mk_tuned_rtsp_server_start(uint16_t port, const cha
     mk_ini_set_option_int(ini, "rtsp.directProxy", 0); // Disable direct proxy.
     mk_ini_set_option_int(ini, "rtsp.lowLatency", 1); // Enable low latency.
 
-    mk_config config = {
-        .thread_num = 4, // Use 4 threads
-        .log_level = 0, // 0 - 4
-        .log_mask = LOG_FILE, // Use file as log holders.
-        .log_file_path = "./logs",
-        .log_file_days = 30, // Max 30 days logs.
-        .ini_is_path = false,
-        .ini = mk_ini_dump_string(ini),
-        .ssl_is_path = false,
-        .ssl = nullptr,
-        .ssl_pwd = nullptr
-    };
+    mk_config config;
+    config.thread_num = 4;
+    config.log_level = 0;
+    config.log_mask = LOG_FILE;
+    config.ini_is_path = false;
+    config.log_file_days = 30;
+    config.ini = mk_ini_dump_string(ini);
+    config.ssl_is_path = false;
+    config.ssl = nullptr;
+    config.ssl_pwd = nullptr;
 
     mk_env_init(&config);
     return mk_rtsp_server_start(port, ssl);

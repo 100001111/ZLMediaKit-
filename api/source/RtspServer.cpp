@@ -138,9 +138,8 @@ void RtspServer::start(short portId, const string &serverId, bool autoClose, con
     proxy_container.clear();
 
     if (!autoClose) {
-        mk_events events = {
-            .on_mk_media_no_reader = on_mk_media_no_reader
-        };
+        mk_events events;
+        events.on_mk_media_no_reader = on_mk_media_no_reader;
         mk_events_listen(&events);
     }
 }

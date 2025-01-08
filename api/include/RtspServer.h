@@ -9,6 +9,7 @@
 #include "mk_events.h"
 #include "mk_util.h"
 #include <string>
+#include <vector>
 
 struct RtspProxy {
     std::string vHost;
