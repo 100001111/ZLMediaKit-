@@ -21,13 +21,24 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.28.1)
 
 # 加载自定义模块
 # Load custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+if(WIN32)
+set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_TOOLCHAIN_FILE "D:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(VCPKG_TARGET_ARCHITECTURE x64)
+set(VCPKG_BUILD_TYPE "release")
+set(VCPKG_HOST_TRIPLET "x64-windows")
+set(VCPKG_TARGET_TRIPLET "x64-windows")
+endif ()
+
 project(ZLMediaKit LANGUAGES C CXX)
+
+
 
 # 使能 C++11
 # Enable C++11
@@ -67,9 +78,16 @@ option(USE_SOLUTION_FOLDERS "Enable solution dir supported" ON)
 # Set the default buffer size of the socket to 256k. If set to 0, the default buffer size of the socket will not be set,
 # and the system kernel default value will be used (setting to 0 is only valid for linux)
 set(SOCKET_DEFAULT_BUF_SIZE 262144 CACHE STRING "Default buffer size for socket" FORCE)
+#
+#set(VCPKG_TARGET_ARCHITECTURE x64)
+#set(VCPKG_TARGET_TRIPLET x64-windows)
+#set(VCPKG_CRT_LINKAGE dynamic)
+#set(VCPKG_LIBRARY_LINKAGE dynamic)
+#set(VCPKG_BUILD_TYPE release)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  set(CMAKE_BUILD_TYPE "Debug")
+  set(CMAKE_BUILD_TYPE "Release")
+  set(CMAKE_FIND_DEBUG_MODE FALSE)
 endif()
 
 message(STATUS "编译类型: ${CMAKE_BUILD_TYPE}")
