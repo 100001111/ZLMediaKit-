@@ -5,6 +5,7 @@
 #pragma once
 #ifndef ZLMEDIAKIT_DISPLAYER_H
 #define ZLMEDIAKIT_DISPLAYER_H
+#define SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT "SDL_VIDEO_WINDOW_SHARE_PIXEL_FORMAT"
 #include "display_helper.h"
 
 using namespace std;
@@ -29,14 +30,33 @@ public:
 
         title = _title;
         hwnd = _hwnd;
-    }
 
-    bool display(AVFrame *frame) {
         if (!win) {
             if (hwnd) {
                 win = SDL_CreateWindowFrom(hwnd);
+                WarnL << "Create from parent " << hwnd;
+            }
+
+            this->winId = SDL_GetWindowID(win);
+            WarnL << "Win Id is: " << this->winId << " " << SDL_GetThreadID(nullptr);
+            
+        }
+    }
+
+    bool display(AVFrame *frame, long winId) {
+        if (winId != this->winId) {
+			return true;
+		}
+        if (!win) {
+            if (hwnd) {
+                win = SDL_CreateWindowFrom(hwnd);
+                WarnL << "Create from parent "<< hwnd;
             } else {
-                win = SDL_CreateWindow(title.data(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, frame->width, frame->height, SDL_WINDOW_OPENGL);
+                win = SDL_CreateWindow(
+                    title.data(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, frame->width, frame->height,
+                    SDL_WINDOW_BORDERLESS | SDL_WINDOW_OPENGL);
+
+                WarnL << "Create from no parent";
             }
         }
 
@@ -52,7 +72,7 @@ public:
         }
 
         if (render && !texture) {
-            if (frame -> format == AV_PIX_FMT_NV12) {
+            if (frame->format == AV_PIX_FMT_NV12) {
                 texture = SDL_CreateTexture(render, SDL_PIXELFORMAT_NV12, SDL_TEXTUREACCESS_STREAMING, frame->width, frame->height);
             } else {
                 texture = SDL_CreateTexture(render, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, frame->width, frame->height);
@@ -60,13 +80,14 @@ public:
         }
 
         if (texture) {
-#if SDL_VERSION_ATLEAST(2,0,16)
+#if SDL_VERSION_ATLEAST(2, 0, 16)
             if (frame->format == AV_PIX_FMT_NV12) {
                 SDL_UpdateNVTexture(texture, nullptr, frame->data[0], frame->linesize[0], frame->data[1], frame->linesize[1]);
             } else
 #endif
             {
-                SDL_UpdateYUVTexture(texture, nullptr, frame->data[0], frame->linesize[0], frame->data[1], frame->linesize[1], frame->data[2], frame->linesize[2]);
+                SDL_UpdateYUVTexture(
+                    texture, nullptr, frame->data[0], frame->linesize[0], frame->data[1], frame->linesize[1], frame->data[2], frame->linesize[2]);
             }
 
             SDL_RenderClear(render);
@@ -78,6 +99,10 @@ public:
 
         return false;
     }
+
+    long getWinId() {
+		return this->winId;
+	}
 
     ~Displayer() {
         if (texture) {
@@ -92,6 +117,8 @@ public:
             SDL_DestroyWindow(win);
             win = nullptr;
         }
+        
+        WarnL << "~Displayer get fired.";
     }
 
 private:
@@ -100,6 +127,7 @@ private:
     SDL_Renderer *render = nullptr;
     SDL_Texture *texture = nullptr;
     void *hwnd = nullptr;
+    long winId = 0;
 };
 
 #endif // ZLMEDIAKIT_DISPLAYER_H
