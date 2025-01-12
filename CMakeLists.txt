@@ -532,6 +532,10 @@ if(ENABLE_PLAYER AND ENABLE_FFMPEG)
   add_subdirectory(player)
 endif()
 
+if (ENABLE_ZY_PLAYER)
+  add_subdirectory(player_zy)
+endif ()
+
 #MediaServer主程序
 #MediaServer main program
 if(ENABLE_SERVER)
