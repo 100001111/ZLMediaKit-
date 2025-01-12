@@ -21,24 +21,23 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required(VERSION 3.28.1)
+cmake_minimum_required(VERSION 3.1.3)
 
 # 加载自定义模块
 # Load custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if(WIN32)
-set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_TOOLCHAIN_FILE "D:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake")
-set(VCPKG_TARGET_ARCHITECTURE x64)
-set(VCPKG_BUILD_TYPE "release")
-set(VCPKG_HOST_TRIPLET "x64-windows")
-set(VCPKG_TARGET_TRIPLET "x64-windows")
+  set(CMAKE_BUILD_TYPE "Release")
+  set(CMAKE_TOOLCHAIN_FILE "D:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake")
+  set(VCPKG_TARGET_ARCHITECTURE x64)
+  set(VCPKG_BUILD_TYPE "release")
+  set(VCPKG_HOST_TRIPLET "x64-windows")
+  set(VCPKG_TARGET_TRIPLET "x64-windows")
 endif ()
 
+
 project(ZLMediaKit LANGUAGES C CXX)
-
-
 
 # 使能 C++11
 # Enable C++11
@@ -49,7 +48,7 @@ option(ENABLE_API_STATIC_LIB "Enable mk_api static lib" OFF)
 option(ENABLE_ASAN "Enable Address Sanitize" OFF)
 option(ENABLE_CXX_API "Enable C++ API SDK" OFF)
 option(ENABLE_FAAC "Enable FAAC" OFF)
-option(ENABLE_FFMPEG "Enable FFmpeg" ON)
+option(ENABLE_FFMPEG "Enable FFmpeg" OFF)
 option(ENABLE_HLS "Enable HLS" ON)
 option(ENABLE_JEMALLOC_STATIC "Enable static linking to the jemalloc library" OFF)
 option(ENABLE_JEMALLOC_DUMP "Enable jemalloc to dump malloc statistics" OFF)
@@ -72,22 +71,14 @@ option(ENABLE_VIDEOSTACK "Enable video stack" OFF)
 option(ENABLE_ZY_PLAYER "Enable zy player" ON)
 option(DISABLE_REPORT "Disable report to report.zlmediakit.com" OFF)
 option(USE_SOLUTION_FOLDERS "Enable solution dir supported" ON)
-
 ##############################################################################
 # 设置socket默认缓冲区大小为256k.如果设置为0则不设置socket的默认缓冲区大小,使用系统内核默认值(设置为0仅对linux有效)
 # Set the default buffer size of the socket to 256k. If set to 0, the default buffer size of the socket will not be set,
 # and the system kernel default value will be used (setting to 0 is only valid for linux)
 set(SOCKET_DEFAULT_BUF_SIZE 262144 CACHE STRING "Default buffer size for socket" FORCE)
-#
-#set(VCPKG_TARGET_ARCHITECTURE x64)
-#set(VCPKG_TARGET_TRIPLET x64-windows)
-#set(VCPKG_CRT_LINKAGE dynamic)
-#set(VCPKG_LIBRARY_LINKAGE dynamic)
-#set(VCPKG_BUILD_TYPE release)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  set(CMAKE_BUILD_TYPE "Release")
-  set(CMAKE_FIND_DEBUG_MODE FALSE)
+  set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 message(STATUS "编译类型: ${CMAKE_BUILD_TYPE}")
@@ -563,10 +554,6 @@ endif()
 #cpp test demo program
 if (ENABLE_TESTS)
   add_subdirectory(tests)
-endif ()
-
-if (ENABLE_ZY_PLAYER)
-  add_subdirectory(player_zy)
 endif ()
 
 # 拷贝www文件夹、配置文件、默认证书
