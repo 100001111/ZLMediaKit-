@@ -42,7 +42,9 @@ if(ENABLE_API_STATIC_LIB)
 elseif(IOS)
   add_library(mk_api STATIC ${API_SRC_LIST})
 else()
-  add_library(mk_api SHARED ${API_SRC_LIST})
+  add_library(mk_api SHARED ${API_SRC_LIST}
+          source/mk_rtsp_proxy.cpp
+          include/RtspServer.h)
 endif()
 
 target_compile_definitions(mk_api

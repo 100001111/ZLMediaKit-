@@ -27,6 +27,16 @@ cmake_minimum_required(VERSION 3.1.3)
 # Load custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+if(WIN32)
+  set(CMAKE_BUILD_TYPE "Release")
+  set(CMAKE_TOOLCHAIN_FILE "D:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake")
+  set(VCPKG_TARGET_ARCHITECTURE x64)
+  set(VCPKG_BUILD_TYPE "release")
+  set(VCPKG_HOST_TRIPLET "x64-windows")
+  set(VCPKG_TARGET_TRIPLET "x64-windows")
+endif ()
+
+
 project(ZLMediaKit LANGUAGES C CXX)
 
 # 使能 C++11
@@ -55,9 +65,10 @@ option(ENABLE_SRT "Enable SRT" ON)
 option(ENABLE_TESTS "Enable Tests" ON)
 option(ENABLE_SCTP "Enable SCTP" ON)
 option(ENABLE_WEBRTC "Enable WebRTC" ON)
-option(ENABLE_X264 "Enable x264" OFF)
+option(ENABLE_X264 "Enable x264" ON)
 option(ENABLE_WEPOLL "Enable wepoll" ON)
 option(ENABLE_VIDEOSTACK "Enable video stack" OFF)
+option(ENABLE_ZY_PLAYER "Enable zy player" ON)
 option(DISABLE_REPORT "Disable report to report.zlmediakit.com" OFF)
 option(USE_SOLUTION_FOLDERS "Enable solution dir supported" ON)
 ##############################################################################
