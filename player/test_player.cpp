@@ -88,29 +88,29 @@ int main(int argc, char *argv[]) {
                 videoTrack->addDelegate([decoder](const Frame::Ptr &frame) { return decoder->inputFrame(frame, false, true); });
             }
 
-            if (audioTrack) {
-                auto decoder = std::make_shared<FFmpegDecoder>(audioTrack);
-                auto audio_player = std::make_shared<AudioPlayer>();
-                // FFmpeg解码时已经统一转换为16位整型pcm
-                audio_player->setup(audioTrack->getAudioSampleRate(), audioTrack->getAudioChannel(), AUDIO_S16);
-                FFmpegSwr::Ptr swr;
-
-                decoder->setOnDecode([audio_player, swr](const FFmpegFrame::Ptr &frame) mutable {
-                    if (!swr) {
-
-# if LIBAVCODEC_VERSION_INT >= FF_CODEC_VER_7_1
-                        swr = std::make_shared<FFmpegSwr>(AV_SAMPLE_FMT_S16, &(frame->get()->ch_layout), frame->get()->sample_rate);
-#else
-                        swr = std::make_shared<FFmpegSwr>(AV_SAMPLE_FMT_S16, frame->get()->channels, frame->get()->channel_layout, frame->get()->sample_rate);
-#endif
-
-                    }
-                    auto pcm = swr->inputFrame(frame);
-                    auto len = pcm->get()->nb_samples * pcm->get()->channels * av_get_bytes_per_sample((enum AVSampleFormat)pcm->get()->format);
-                    audio_player->playPCM((const char *)(pcm->get()->data[0]), MIN(len, frame->get()->linesize[0]));
-                });
-                audioTrack->addDelegate([decoder](const Frame::Ptr &frame) { return decoder->inputFrame(frame, false, true); });
-            }
+//            if (audioTrack) {
+//                auto decoder = std::make_shared<FFmpegDecoder>(audioTrack);
+//                auto audio_player = std::make_shared<AudioPlayer>();
+//                // FFmpeg解码时已经统一转换为16位整型pcm
+//                audio_player->setup(audioTrack->getAudioSampleRate(), audioTrack->getAudioChannel(), AUDIO_S16);
+//                FFmpegSwr::Ptr swr;
+//
+//                decoder->setOnDecode([audio_player, swr](const FFmpegFrame::Ptr &frame) mutable {
+//                    if (!swr) {
+//
+//# if LIBAVCODEC_VERSION_INT >= FF_CODEC_VER_7_1
+//                        swr = std::make_shared<FFmpegSwr>(AV_SAMPLE_FMT_S16, &(frame->get()->ch_layout), frame->get()->sample_rate);
+//#else
+//                        swr = std::make_shared<FFmpegSwr>(AV_SAMPLE_FMT_S16, frame->get()->channels, frame->get()->channel_layout, frame->get()->sample_rate);
+//#endif
+//
+//                    }
+//                    auto pcm = swr->inputFrame(frame);
+//                    auto len = pcm->get()->nb_samples * pcm->get()->channels * av_get_bytes_per_sample((enum AVSampleFormat)pcm->get()->format);
+//                    audio_player->playPCM((const char *)(pcm->get()->data[0]), MIN(len, frame->get()->linesize[0]));
+//                });
+//                audioTrack->addDelegate([decoder](const Frame::Ptr &frame) { return decoder->inputFrame(frame, false, true); });
+//            }
         });
 
         player->setOnShutdown([](const SockException &ex) { WarnL << "play shutdown: " << ex.what(); });

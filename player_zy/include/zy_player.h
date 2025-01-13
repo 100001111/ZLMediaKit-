@@ -5,6 +5,15 @@
 #ifndef ZLMEDIAKIT_ZY_PLAYER_H
 #define ZLMEDIAKIT_ZY_PLAYER_H
 
+#if defined(_MSC_VER)
+#define MY_LIB_API __declspec(dllexport) // Microsoft
+#elif defined(__GNUC__)
+#define MY_LIB_API __attribute__((visibility("default"))) // GCC
+#else
+#define MY_LIB_API // Most compilers export all the symbols by default. We hope for the best here.
+#pragma warning Unknown dynamic link import/export semantics.
+#endif
+
 #include "Codec/Transcode.h"
 #include "Common/config.h"
 #include "Player/MediaPlayer.h"
@@ -28,12 +37,12 @@ private:
     long winId = 0;
 };
 
-extern "C" __declspec(dllexport) ZyPlayer* ZyPlayer_Create(void *hwnd, const char *title) { return new ZyPlayer(hwnd, title); }
-extern "C" __declspec(dllexport) void ZyPlay(ZyPlayer* zyPlayer, const char *url) { zyPlayer->play(url); }
-extern "C" __declspec(dllexport) void ZyPlayer_Delete(ZyPlayer *zyPlayer) {
+extern "C" MY_LIB_API ZyPlayer* ZyPlayer_Create(void *hwnd, const char *title) { return new ZyPlayer(hwnd, title); }
+extern "C" MY_LIB_API void ZyPlay(ZyPlayer* zyPlayer, const char *url) { zyPlayer->play(url); }
+extern "C" MY_LIB_API void ZyPlayer_Delete(ZyPlayer *zyPlayer) {
     delete zyPlayer;
     WarnL << "ZyPlayer, I have shutdown: ";
 }
-extern "C" __declspec(dllexport) void ZyPlayer_Stop(ZyPlayer *zyPlayer) { zyPlayer->stop(); }
+extern "C" MY_LIB_API void ZyPlayer_Stop(ZyPlayer *zyPlayer) { zyPlayer->stop(); }
 
 #endif // ZLMEDIAKIT_ZY_PLAYER_H
