@@ -7,7 +7,7 @@
  * LICENSE file in the root of the source tree. All contributing project authors
  * may be found in the AUTHORS file in the root of the source tree.
  */
-
+#define ENABLE_FFMPEG
 #if defined(ENABLE_FFMPEG)
 #if !defined(_WIN32)
 #include <dlfcn.h>

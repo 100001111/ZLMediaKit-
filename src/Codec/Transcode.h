@@ -11,6 +11,7 @@
 #ifndef ZLMEDIAKIT_TRANSCODE_H
 #define ZLMEDIAKIT_TRANSCODE_H
 
+#define ENABLE_FFMPEG
 #if defined(ENABLE_FFMPEG)
 
 #include "Util/TimeTicker.h"
